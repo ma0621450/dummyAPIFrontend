@@ -21,6 +21,7 @@ const ENDPOINT_TEMPLATES = [
 
 export default function PlaygroundPage() {
   const [selectedTemplateIdx, setSelectedTemplateIdx] = useState(0);
+  const [apiKey, setApiKey] = useState("");
   const [variables, setVariables] = useState<Record<string, string>>({
     slug: "est-non-ipsum-ipsa-fugiat",
     id: "1",
@@ -30,6 +31,12 @@ export default function PlaygroundPage() {
   const [response, setResponse] = useState<any>(null);
   const [status, setStatus] = useState<number | null>(null);
   const [time, setTime] = useState<number | null>(null);
+
+  // Auto-load key
+  useEffect(() => {
+    const storedKey = localStorage.getItem("dummy_api_key");
+    if (storedKey) setApiKey(storedKey);
+  }, []);
 
   // Construct final URL based on selected template and variables
   const template = ENDPOINT_TEMPLATES[selectedTemplateIdx];
@@ -49,7 +56,12 @@ export default function PlaygroundPage() {
 
     const startTime = performance.now();
     try {
-      const res = await fetch(`${BASE_URL}${finalPath}`);
+      const res = await fetch(`${BASE_URL}${finalPath}`, {
+        headers: {
+          "Authorization": `Bearer ${apiKey}`,
+          "Content-Type": "application/json"
+        }
+      });
       const endTime = performance.now();
       
       setStatus(res.status);
@@ -74,8 +86,21 @@ export default function PlaygroundPage() {
 
       <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm mb-8">
         <h2 className="text-lg font-semibold text-gray-900 mb-4">Select Endpoint</h2>
-        
 
+        {/* API Key Input */}
+        <div className="mb-6">
+          <label className="block text-xs font-semibold text-gray-500 uppercase mb-1">
+            API Key (Required)
+          </label>
+          <input
+            type="text"
+            value={apiKey}
+            onChange={(e) => setApiKey(e.target.value)}
+            placeholder="paste_your_key_here"
+            className="w-full px-3 py-2 border border-blue-200 bg-blue-50 text-blue-700 rounded text-sm focus:ring-2 focus:ring-blue-500 outline-none font-mono"
+          />
+        </div>
+        
         <div className="flex flex-wrap gap-2 mb-6">
           {ENDPOINT_TEMPLATES.map((ep, idx) => (
             <button

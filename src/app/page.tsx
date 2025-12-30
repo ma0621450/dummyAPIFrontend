@@ -1,3 +1,5 @@
+import ApiKeyGenerator from "@/components/ApiKeyGenerator";
+
 export default function HomePage() {
   return (
     <>
@@ -7,6 +9,8 @@ export default function HomePage() {
       <p className="text-xl text-gray-600 mb-8">
         A fake REST API for testing and learning
       </p>
+
+      <ApiKeyGenerator />
 
       <div className="space-y-6">
         <section>
